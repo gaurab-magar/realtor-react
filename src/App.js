@@ -1,11 +1,30 @@
 import './App.css';
+import { BrowserRouter as Router,Routes,Route } from 'react-router-dom';
+import { Header } from './Components/Header';
+import {Home} from './Pages/Home';
+import { SignIn } from './Pages/SignIn';
+import { SignUp } from './Pages/SignUp';
+import { ForgotPass } from './Pages/ForgotPass';
+import { Offers } from './Pages/Offers';
+import { Profile } from './Pages/Profile';
+import { Footer } from './Components/Footer';
 
 function App() {
   return (
-    <div className="App">
-      <h3 className='bg-slate-500 text-sky-300'>hi my  name is gaurab thapa magar</h3>
-
-    </div>
+    <>
+    <Router>
+      <Header />
+        <Routes>
+          <Route path='/' element={<Home />} />
+          <Route path="/signin" element={<SignIn />}/>
+          <Route path="/signup" element={<SignUp />}/>
+          <Route path="/forgotpass" element={<ForgotPass />}/>
+          <Route path="/offers" element={<Offers />}/>
+          <Route path="/profile" element={<Profile />}/>
+        </Routes>
+      <Footer />
+    </Router>
+    </>
   );
 }
 
