@@ -8,7 +8,8 @@ import { ForgotPass } from './Pages/ForgotPass';
 import { Offers } from './Pages/Offers';
 import { Profile } from './Pages/Profile';
 import { Footer } from './Components/Footer';
-
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 function App() {
   return (
     <>
@@ -24,6 +25,7 @@ function App() {
         </Routes>
       <Footer />
     </Router>
+    <ToastContainer position="bottom-right"/>
     </>
   );
 }

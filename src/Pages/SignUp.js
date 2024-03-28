@@ -4,6 +4,11 @@ import { FaEyeSlash } from "react-icons/fa";
 import { Link } from 'react-router-dom';
 import navbarImg from '../Assets/navbar.png';
 import { OAuth } from '../Components/OAuth';
+import {getAuth, createUserWithEmailAndPassword, updateProfile} from 'firebase/auth';
+import {db} from '../Firebase';
+import { serverTimestamp, setDoc ,doc} from 'firebase/firestore';
+import { useNavigate } from 'react-router-dom';
+import { Bounce, toast } from 'react-toastify';
 
 export const SignUp = () => {
   const [show,setShow] = useState(false)
@@ -13,11 +18,49 @@ export const SignUp = () => {
     password:''
   });
   const {email , password , username} = formData;
+  const navigate = useNavigate();
   function onChange(e){
     setFormData((prevState)=>({
       ...prevState ,
       [e.target.id]: e.target.value,
     }))
+  }
+  async function onSubmit(e){
+    e.preventDefault();
+    try{
+      const auth = getAuth();
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      updateProfile(auth.currentUser,{
+        displayName: username
+      })
+      const user = userCredential.user
+      const formDataCopy = {...formData}
+      delete formDataCopy.password
+      formDataCopy.timestamp = serverTimestamp();
+      await setDoc(doc(db, 'users', user.uid), formDataCopy);
+      navigate('/');
+      toast.success('Signed Up Successfully!',{
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+        transition: Bounce,
+      })
+    
+    }catch(error){
+      toast.error("Error Occured!", {
+          position: "top-right",
+          autoClose: false,
+          hideProgressBar: false,
+          closeOnClick: true,
+          draggable: true,
+          progress: undefined,
+        });
+    }
   }
   return (
     <div className="flex justify-center flex-wrap items-center p-6 max-w-6xl mx-auto">
@@ -32,7 +75,7 @@ export const SignUp = () => {
             <h2 className='text-slate-300'>To get started, please sign Up.</h2>
           </div>
         </div>
-        <form>
+        <form onSubmit={onSubmit}>
           <label htmlFor='username' className='text-white'>Username</label>
           <input id='username' className='w-full px-4 py-2 mb-4' name='usrename' type='text' value={username} onChange={onChange} placeholder='Username' />
           <label htmlFor='email' className='text-white'>Email address</label>
@@ -52,7 +95,7 @@ export const SignUp = () => {
         </form>
         <div className='flex justify-between text-slate-400 w-full'>
             <p>Already have an  account ?
-              <Link to='/signup' className='text-yellow-200 hover:text-yellow-500 ml-4'>Sign In</Link>  
+              <Link to='/signin' className='text-yellow-200 hover:text-yellow-500 ml-4'>Sign In</Link>  
             </p>
             <p>
               <Link to='/forgotpass' className='text-yellow-200 hover:text-yellow-500'>Forgot password ?</Link>  
