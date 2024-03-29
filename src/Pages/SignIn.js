@@ -1,15 +1,19 @@
 import React, { useState } from 'react';
 import { FaRegEye } from "react-icons/fa";
 import { FaEyeSlash } from "react-icons/fa";
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import navbarImg from '../Assets/navbar.png';
 import { OAuth } from '../Components/OAuth';
+import { signInWithEmailAndPassword , getAuth } from 'firebase/auth';
+import {toast} from 'react-toastify';
+
 export const SignIn = () => {
   const [show,setShow] = useState(false)
   const [formData , setFormData] = useState({
     email:'',
     password:''
   });
+  let navigate = useNavigate();
   const {email , password} = formData;
   function onChange(e){
     setFormData((prevState)=>({
@@ -17,6 +21,21 @@ export const SignIn = () => {
       [e.target.id]: e.target.value,
     }))
   }
+  async function onSubmit(e){
+    e.preventDefault();
+    try{
+      const auth = getAuth()
+      const userCredential = await signInWithEmailAndPassword(auth,email,password)
+      if(userCredential.user){
+        navigate('/')
+      }
+      toast.success('signin successfully')
+
+    }catch(error){
+      toast.error(`Bad user crenditials${error}`)
+    }
+  }
+
   return (
     <div className="flex justify-center flex-wrap items-center p-6 max-w-6xl mx-auto">
       <div className='md:w-[67%] lg:w-[50%] mb-12 md:mb-6'>
@@ -30,7 +49,7 @@ export const SignIn = () => {
             <h2 className='text-slate-300'>To get started, please sign in.</h2>
           </div>
         </div>
-        <form>
+        <form onSubmit={onSubmit}>
           <label htmlFor='email' className='text-white'>Email address</label>
           <input id='email' className='w-full px-4 py-2 mb-4' name='email' type='text' value={email} onChange={onChange} placeholder='example@gmail.com' />
           <div className='relative'>
