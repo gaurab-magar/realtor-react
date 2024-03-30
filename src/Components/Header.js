@@ -1,10 +1,23 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import navbarImg from '../Assets/navbar.png';
 import {Link, useLocation} from 'react-router-dom';
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
 
 export const Header = () => {
+  const [pageState , setPageState] = useState()
   const location = useLocation();
-  console.log(location.pathname);
+  const auth = getAuth();
+
+  useEffect(()=>{
+    onAuthStateChanged(auth, (user) => {
+      if(user){
+        setPageState(user.displayName);
+      }else{
+        setPageState("Sign In");
+      }
+      })
+  },[auth])
+
   function pathMatchRoute(route) {
     if(route === location.pathname){
       return true
@@ -26,9 +39,14 @@ export const Header = () => {
               <Link to='/offers'>
                 <li className={`cursor-pointer py-5 px-2 hover:text-yellow-500 text-gray-400 ${pathMatchRoute('/offers') && "text-light border-b-yellow-400 border-b-[3px]"}`}>Offers</li>
               </Link>
-              <Link to='/signin'>
-                <li className={`cursor-pointer py-5 px-2 hover:text-yellow-500 text-gray-400 ${pathMatchRoute('/signin') && "text-light border-b-yellow-400 border-b-[3px]"}`}>Sign In</li>
-              </Link>
+              {pageState ? 
+                <Link to='/profile'>
+                  <li className={`cursor-pointer py-5 px-2 hover:text-yellow-500 text-gray-400 ${pathMatchRoute('/profile') && "text-light border-b-yellow-400 border-b-[3px]"}`}>{pageState}</li>
+                </Link>:
+                <Link to='/signin'>
+                  <li className={`cursor-pointer py-5 px-2 hover:text-yellow-500 text-gray-400 ${pathMatchRoute('/signin') && "text-light border-b-yellow-400 border-b-[3px]"}`}>{pageState}</li>
+                </Link>
+              }
             </ul>
           </div>
         </div>
