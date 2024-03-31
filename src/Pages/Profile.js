@@ -5,6 +5,8 @@ import {toast} from 'react-toastify';
 import {db} from '../Firebase';
 import { doc } from 'firebase/firestore';
 import { updateDoc } from 'firebase/firestore';
+import { FaHome } from "react-icons/fa";
+import { Link } from 'react-router-dom';
 
 export const Profile = () => {
 
@@ -67,8 +69,13 @@ export const Profile = () => {
               </p>
               <p onClick={onLogOut} className='mx-2 text-yellow-200 hover:text-yellow-500 cursor-pointer'>sign out</p>
             </div>
-            
           </form>
+          <Link to='/create-listing'>
+            <button  type='submit' className=' my-2 text-white rounded-md font-bold py-2 w-full flex items-center justify-center bg-slate-500'>
+              <FaHome className='mr-2 text-2xl' />
+              Sell Or Rent Your Home
+            </button>
+          </Link>
         </div>
       </section>
     </>
