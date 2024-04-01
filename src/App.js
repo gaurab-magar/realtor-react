@@ -27,6 +27,9 @@ function App() {
 
           <Route path="/profile" element={<PrivateRoute />}>
             <Route path="/profile" element={<Profile />}/>
+          </Route> 
+          <Route path='/createlisting' element={<PrivateRoute />}>
+            <Route path="/createlisting" element={<CreateLinsting />}/>
           </Route>
         </Routes>
       <Footer />
