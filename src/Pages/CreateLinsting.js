@@ -1,8 +1,12 @@
 import React, { useState } from 'react'
 import { Spinner } from '../Components/Spinner';
 import { toast } from 'react-toastify';
+import{getStorage , ref, uploadBytesResumable} from 'firebase/storage';
+import {getAuth } from "../Firebase/auth.js";
+import {v4 as uuidv4, v4} from 'uuid';
 
 export const CreateLinsting = () => {
+    const auth = getAuth();
     const [geolocationEnabled , setGeolocationEnabled] = useState(true);
     const [loading , setLoading] = useState(false);
     const [formData , setFormData] = useState({
@@ -48,7 +52,7 @@ export const CreateLinsting = () => {
         }
     }
 
-    function onSubmit(e){
+    async function onSubmit(e){
         e.preventDefault();
         setLoading(true);
         try{
@@ -65,13 +69,65 @@ export const CreateLinsting = () => {
             let geoLocation = {}
             let location
             if(geolocationEnabled){
+                const response = await fetch(`https://ipapi.co/json/?address=${address}&key=${process.env.geolocation_API}`);
+                const data = await response.json()
 
+                geolocation.lat = data.results[0]?.geometry.location.lat ?? 0;
+                geolocation.lng = data.results[0]?.geometry.location.lng ?? 0;
+                location = data.status === 'Zero_Results'&&undefined;
+
+                if(location === undefined || location.includes('undefined')){
+                    setLoading(false)
+                    toast.error('Geolocaion is not  available please enter the address manually');
+                    return;
+                }
+            }else{
+                geolocation.lat = latitude;
+                geolocation.lng = longitude;
             }
+            async function storeImage(image){
+                return new Promise((resolve,reject)=>{
+                    const storage= getStorage();
+                    const fileName = `${auth.currentUser.uid}-${image.name}-${uuidv4()}`;
+                    const storageRef = ref(storage, fileName);
+                    const upLoadTask = uploadBytesResumable(storageRef, image);
+                    upLoadTask.on('state_changed', (snapshot) => {
+                        const  progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                        switch(snapshot.state){
+                            case 'pending':
+                                console.log(`uploading ${progress}%`);
+                                break;
+                            case 'running':
+                                console.log(`Upload in progres: ${progress}%`);
+                                break;
+                            default:
+                                if(snapshot.state == 'success'){
+                                    console.log('Upload success');
+                                    resolve({id: snapshot.metadata.firebaseStorageDownloadTokens, ...geolocation});
+                                    resolve({id: snapshot.metadata.ref.fullPath, ...geoLocation});
+                                } else {
+                                    console.log('failed');
+                                    reject(snapshot.error);
+                                }
+                        }
+                    })
+
+                })
+            }
+            const imgUrls = await Promise.all(
+                [...images]
+                .map((image)=> storeImage(image))
+                .catch((error)=>{
+                    setLoading(false)
+                    toast.error('Images not uploaded')
+                    return;
+                })
+                )
         }catch{
             alert('error during filling form')
         }
-        
     }
+
     if(loading){
         return <Spinner />
     }
@@ -164,7 +220,7 @@ export const CreateLinsting = () => {
                         <input 
                             className='w-full text-black py-2 transition duration-150 ease-in text-center rounded-md'
                             placeholder="Price" 
-                            type='number' id='regularPrice'
+                            type='number' id='reglarPrice'
                             required value={reglarPrice} onChange={onChanged}
                             min="50" max="40000000">
                         </input>
