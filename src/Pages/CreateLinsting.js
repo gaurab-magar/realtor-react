@@ -2,18 +2,22 @@ import React, { useState } from 'react'
 import { Spinner } from '../Components/Spinner';
 import { toast } from 'react-toastify';
 import{getStorage , ref, uploadBytesResumable} from 'firebase/storage';
-import {getAuth } from "../Firebase/auth.js";
-import {v4 as uuidv4, v4} from 'uuid';
+import {v4 as uuidv4} from 'uuid';
+import {addDoc, collection, serverTimestamp} from 'firebase/firestore';
+import {db} from '../Firebase.js';
+import { useNavigate } from 'react-router';
+import { getAuth } from 'firebase/auth';
+
 
 export const CreateLinsting = () => {
     const auth = getAuth();
-    const [geolocationEnabled , setGeolocationEnabled] = useState(true);
     const [loading , setLoading] = useState(false);
+    let navigate =  useNavigate() ; 
     const [formData , setFormData] = useState({
         type:'rent',
         name:'',
-        bedroom:1,
-        bathroom:1,
+        bedroom:null,
+        bathroom:null,
         parking:false,
         furnished:false,
         address:'',
@@ -23,8 +27,9 @@ export const CreateLinsting = () => {
         discountPrice:0,
         latitude:0,
         longitude:0,
-        images:{}
+        images:[]
     });
+
     const {type , name , bedroom , bathroom , parking , furnished ,address,description, offer , reglarPrice , discountPrice,latitude,longitude,images} = formData;
     
     function onChanged(e){
@@ -40,7 +45,7 @@ export const CreateLinsting = () => {
         if(e.target.files){
             setFormData((prevState)=>({
                 ...prevState,
-                images: e.target.files
+                images: Array.from(e.target.files)
             }))
         }
         //text
@@ -52,85 +57,158 @@ export const CreateLinsting = () => {
         }
     }
 
+    // async function onSubmit(e){
+    //     e.preventDefault();
+    //     setLoading(true);
+    //     try{
+    //         if(+discountPrice >= +reglarPrice){
+    //             setLoading(false)
+    //             toast.error('regular price should be greater than discount price')
+    //             return;
+    //         }
+    //         if(images.length > 6){
+    //             setLoading(false)
+    //             toast.warning("you can't upload more than 6 image at once");
+    //             return;
+    //         }
+
+    //         //images
+    //         async function storeImage(image) {
+    //             return new Promise((resolve, reject) => {
+    //                 const storage = getStorage();
+    //                 const fileName = `${auth.currentUser.uid}-${image.name}-${uuidv4()}`;
+    //                 const storageRef = ref(storage, fileName);
+    //                 const upLoadTask = uploadBytesResumable(storageRef, image);
+    //                 upLoadTask.on('state_changed', (snapshot) => {
+    //                     const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+    //                     switch (snapshot.state) {
+    //                         case 'pending':
+    //                             console.log(`Uploading ${progress}%`);
+    //                             break;
+    //                         case 'running':
+    //                             console.log(`Upload in progress: ${progress}%`);
+    //                             break;
+    //                         default:
+    //                             if (snapshot.state === 'success') {
+    //                                 console.log('Upload success');
+    //                                 resolve({ id: snapshot.metadata.firebaseStorageDownloadTokens });
+    //                             } else {
+    //                                 console.log('Failed');
+    //                                 reject(snapshot.error);
+    //                             }
+    //                     }
+    //                 });
+    //             });
+    //         }
+
+    //         const imgUrls = await Promise.all(
+    //             images.map((image) => storeImage(image)).catch((error) => {
+    //                 setLoading(false);
+    //                 toast.error('Images not uploaded');
+    //                 return [];
+    //             })
+    //         );
+
+    //         const formDataCopy = {
+    //             ...formData,
+    //             imgUrls,
+    //             timeStamp: serverTimestamp(),
+    //         };
+    //         delete formDataCopy.images;
+    //         !formDataCopy.offer && delete formDataCopy.discountPrice;
+
+    //         await addDoc(collection(db, 'listings'), formDataCopy);
+    //         setLoading(false);
+    //         toast.success('List is created successfully');
+    //         navigate('/');
+    //     } catch (error) {
+    //         console.error(error);
+    //         alert('Error during filling form');
+    //     }
+    // }
     async function onSubmit(e){
         e.preventDefault();
         setLoading(true);
-        try{
-            if(discountPrice >= reglarPrice){
+        try {
+            if (+discountPrice >= +reglarPrice) {
                 setLoading(false)
-                toast.error('regular price should be greater than discount price')
+                toast.error('Regular price should be greater than discount price');
                 return;
             }
-            if(images.length > 6){
-                setLoading(false)
-                toast.warning("you can't upload more than 6 image at once");
+            if (images.length > 6) {
+                setLoading(false);
+                toast.warning("You can't upload more than 6 images at once");
                 return;
             }
-            let geoLocation = {}
-            let location
-            if(geolocationEnabled){
-                const response = await fetch(`https://ipapi.co/json/?address=${address}&key=${process.env.geolocation_API}`);
-                const data = await response.json()
-
-                geolocation.lat = data.results[0]?.geometry.location.lat ?? 0;
-                geolocation.lng = data.results[0]?.geometry.location.lng ?? 0;
-                location = data.status === 'Zero_Results'&&undefined;
-
-                if(location === undefined || location.includes('undefined')){
-                    setLoading(false)
-                    toast.error('Geolocaion is not  available please enter the address manually');
-                    return;
-                }
-            }else{
-                geolocation.lat = latitude;
-                geolocation.lng = longitude;
-            }
-            async function storeImage(image){
-                return new Promise((resolve,reject)=>{
-                    const storage= getStorage();
+    
+            // Images
+            async function storeImage(image) {
+                return new Promise((resolve, reject) => {
+                    const storage = getStorage();
                     const fileName = `${auth.currentUser.uid}-${image.name}-${uuidv4()}`;
                     const storageRef = ref(storage, fileName);
                     const upLoadTask = uploadBytesResumable(storageRef, image);
                     upLoadTask.on('state_changed', (snapshot) => {
-                        const  progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                        switch(snapshot.state){
+                        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                        switch (snapshot.state) {
                             case 'pending':
-                                console.log(`uploading ${progress}%`);
+                                console.log(`Uploading ${progress}%`);
                                 break;
                             case 'running':
-                                console.log(`Upload in progres: ${progress}%`);
+                                console.log(`Upload in progress: ${progress}%`);
                                 break;
                             default:
-                                if(snapshot.state == 'success'){
+                                if (snapshot.state === 'success') {
                                     console.log('Upload success');
-                                    resolve({id: snapshot.metadata.firebaseStorageDownloadTokens, ...geolocation});
-                                    resolve({id: snapshot.metadata.ref.fullPath, ...geoLocation});
+                                    // Stop loading spinner
+                                    setLoading(false);
+                                    console.log('Loading stopped');
+                                    // Navigate to home page
+                                    navigate('/');
+                                    console.log('Navigated to home page');
+                                    resolve({ id: snapshot.metadata.firebaseStorageDownloadTokens });
                                 } else {
-                                    console.log('failed');
+                                    console.log('Failed');
                                     reject(snapshot.error);
                                 }
                         }
-                    })
-
-                })
+                    });
+                });
             }
+    
             const imgUrls = await Promise.all(
-                [...images]
-                .map((image)=> storeImage(image))
-                .catch((error)=>{
-                    setLoading(false)
-                    toast.error('Images not uploaded')
-                    return;
-                })
-                )
-        }catch{
-            alert('error during filling form')
+                Array.from(images).map((image) => storeImage(image))
+            ).catch((error) => {
+                setLoading(false);
+                toast.error('Images not uploaded');
+                return [];
+            });
+
+            const formDataCopy = {
+                ...formData,
+                imgUrls,
+                timeStamp: serverTimestamp(),
+                userRef :  auth.currentUser.uid, 
+            };
+            delete formDataCopy.images;
+            !formDataCopy.offer && delete formDataCopy.discountPrice;
+    
+            await addDoc(collection(db, 'listings'), formDataCopy);
+            setLoading(false);
+            toast.success('List is created successfully');
+            navigate('/');
+        } catch (error) {
+            console.error(error);
+            alert('Error during filling form');
         }
     }
 
     if(loading){
         return <Spinner />
     }
+
+   
+
   return (
     <>
         <main className='text-white max-w-md mx-auto px-3'>
@@ -152,11 +230,11 @@ export const CreateLinsting = () => {
                 <div className='my-2 flex items-center justify-between gap-3'>
                     <div>
                         <label htmlFor='bed' className='font-semibold'>Bed:</label><br />
-                        <input className='w-full text-black py-2 transition duration-150 ease-in text-center rounded-md' type='number' value={bedroom} onChange={onChanged}  min='1' id='bed' required/>
+                        <input className='w-full text-black py-2 transition duration-150 ease-in text-center rounded-md' type='number' value={bedroom === null ? '': bedroom} onChange={onChanged}  min='1' id='bedroom' required/>
                     </div>
                     <div>
                         <label htmlFor='bath' className='font-semibold'>BathRoom:</label><br />
-                        <input className='w-full text-black py-2 transition duration-150 ease-in text-center rounded-md' type='number' value={bathroom} onChange={onChanged}  min='1' id='bath' required/>
+                        <input className='w-full text-black py-2 transition duration-150 ease-in text-center rounded-md' type='number' value={bathroom === null ? '': bathroom} onChange={onChanged}  min='1' id='bathroom' required/>
                     </div>
                 </div>
                 <p className='text-lg mt-3 font-semibold'>Parking Spot:</p>
@@ -186,7 +264,7 @@ export const CreateLinsting = () => {
                     <label htmlFor='address' className='font-semibold'>Address: </label><br />
                     <textarea type='text' id='address' placeholder='address' className='w-full text-black py-2 text-xl border border-yellow-500 rounded-md px-3 transition duration-150 ease-in' value={address} onChange={onChanged} required maxLength={30} />
                 </div>
-                {!geolocationEnabled && (
+               
                     <div className='flex items-center justify-between space-x-6'>
                         <div>
                             <p className='text-lg font-semibold'>latitude:</p>
@@ -197,7 +275,6 @@ export const CreateLinsting = () => {
                             <input className='py-2 text-black px-3 rounded-md text-xl w-full' type='number' id='longitude' value={longitude} min='-180' max='180' onChange={onChanged} required></input>
                         </div>
                     </div>
-                )}
                 <div className='my-2'>
                     <label htmlFor='description' className='font-semibold'>Description: </label><br />
                     <textarea type='text' id='description' placeholder='Description' className='w-full text-black py-2 text-xl border border-yellow-500 rounded-md px-3 transition duration-150 ease-in' value={description} onChange={onChanged} required maxLength={30} />
