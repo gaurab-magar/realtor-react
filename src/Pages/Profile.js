@@ -14,7 +14,7 @@ export const Profile = () => {
 
   const auth =  getAuth();
   const navigate = useNavigate();
-  const [listings , setListings] = useState(null);
+  // const [listings , setListings] = useState(null);
   const [loading , setLoading] = useState(true);
 
   const [changeDetails , setChangeDetails] = useState(false);
@@ -51,25 +51,52 @@ export const Profile = () => {
     auth.signOut();
     navigate('/');
   }
-  useEffect(()=>{
-    async function fetchUserListing(){
-        const listingRef = collection(db, "listings");
-        const q = query(listingRef , 
-            where('userRef', '==',auth.currentUser.uid), 
-            orderBy( 'timeStamp','desc'));
-        const querySnap = await getDocs(q);
-        let listings = [];
-        querySnap.forEach((doc)=> {
-            return listings.push({
-                id: doc.id,
-                data: doc.data(),
-            })
-        })
-        setListings(listings);
-        setLoading(false);
-    }
-    fetchUserListing();
-},[auth.currentUser.uid]);
+
+  let listingRent = [
+    {
+      image:'https://media.istockphoto.com/id/1139966848/ro/fotografie/abstract-blur-living-zona-de-interior-pentru-fundal-imagine.jpg?s=1024x1024&w=is&k=20&c=d4KBhRwwJvuYosluQklHno1iHv5lmGlemMeLHshnHxM=',
+      title:'luxury Designer Townhall',
+      location: '34 velvet Road, port melourne, victory',
+      price: '$1,859 / month',
+      bed: '5 Beds',
+      bath: '3 Baths'
+    },
+    {
+      image:'https://media.istockphoto.com/id/651191036/ro/fotografie/interior-cu-canapea-ilustra%C8%9Bie-3d.jpg?s=1024x1024&w=is&k=20&c=jbC8lPdqeywBGUQBTlyJfxTfveYelVRZYj5aupmmJ1w=',
+      title:'Room for rent with pool',
+      location: '4/78 Raglan Street',
+      price: '$1,859 / month',
+      bed: '1 Beds',
+      bath: '1 Baths'
+    },
+    {
+      image:'https://media.istockphoto.com/id/651172614/ro/fotografie/interior-cu-canapea-ilustra%C8%9Bie-3d.jpg?s=1024x1024&w=is&k=20&c=RATjqp3mInzPQshsiEZNb1B9i-tWO6szz5daz-y7oPw=',
+      title:'Elegant, spacious theme',
+      location: '3/15 petkell parade',
+      price: '$1,859 / month',
+      bed: '2 Beds',
+      bath: '1 Baths'
+    },
+  ]
+//   useEffect(()=>{
+//     async function fetchUserListing(){
+//         const listingRef = collection(db, "listings");
+//         const q = query(listingRef , 
+//             where('userRef', '==',auth.currentUser.uid), 
+//             orderBy( 'timeStamp','desc'));
+//         const querySnap = await getDocs(q);
+//         let listings = [];
+//         querySnap.forEach((doc)=> {
+//             return listings.push({
+//                 id: doc.id,
+//                 data: doc.data(),
+//             })
+//         })
+//         setListings(listings);
+//         setLoading(false);
+//     }
+//     fetchUserListing();
+// },[auth.currentUser.uid]);
 
   return (
     <>
@@ -101,16 +128,16 @@ export const Profile = () => {
         </div>
       </section>
       <div className='max-w-6xl px-3 mt-6 mx-auto'>
-        {!loading && listings.length > 0 && (
-          <>
             <h1 className='text-white text-3xl text-center font-semibold'>my Listings</h1>
-            <ul>
-              {listings.map((listing)=>(
-                <ListingItem listing={listing} id={listing.id} key={listing.id} />
-              ))}
-            </ul>
-          </>
-        )}
+            <section className="text-gray-600">
+              <div className="container px-2 py-7 mx-auto">
+                <div className="flex  flex-wrap">
+                    {listingRent.map((listing)=>(
+                      <ListingItem listing={listing} id={listing.id} key={listing.id} />
+                    ))}
+                </div>
+              </div>
+            </section>
       </div>
     </>
   )
