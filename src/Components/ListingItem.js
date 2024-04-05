@@ -4,7 +4,7 @@ import { FaUserEdit } from "react-icons/fa";
 import { MdDeleteOutline } from "react-icons/md";
 import { Link } from 'react-router-dom';
 
-export const ListingItem = ({listing,id}) => {
+export const ListingItem = ({listing,id,onDelete}) => {
   return (
   <div className="p-4 md:w-1/3">
     <Link to={`/category/${listing.type}/${id}`}>
@@ -12,7 +12,7 @@ export const ListingItem = ({listing,id}) => {
           <img loading='lazy' className="lg:h-44 md:h-36 w-full object-cover object-center hover:scale-110 transition-scale duration-200 ease-in" src={listing.image} alt="blog" />
           <p className='font-semibold bg-blue-700 p-2 rounded-md text-white absolute top-2 left-2 text-xs shadow-lg'>7 Hours ago</p>
           <div className="p-4">
-            <h2 className="tracking-widest text-xs title-font font-medium text-gray-400 mb-1 flex items-center"><CiLocationOn className='text-red-700 text-3xl mr-2'/>{listing.location}</h2>
+            <h2 className="tracking-widest text-xs title-font font-medium text-gray-400 mb-1 flex items-center"><CiLocationOn className='text-red-700 text-2xl mr-2'/>{listing.location}</h2>
             <h1 className="title-font text-lg font-medium text-black-50 mb-3">{listing.title}</h1>
             <p className="leading-relaxed mb-3 text-gray-400">{listing.price}</p>
             <div className='flex items-center start my-2 '>
@@ -30,12 +30,13 @@ export const ListingItem = ({listing,id}) => {
                   <path d="M12 5l7 7-7 7"></path>
                 </svg>
               </a>
-              <button className='ml-auto mr-3 text-xl text-blue-500'>
-                <FaUserEdit />
-              </button>
-              <button className='text-xl text-red-700'>
-                <MdDeleteOutline />
-              </button>
+
+                <Link to='/create-listing' className='ml-auto mr-3 text-xl text-blue-500 hover:scale-125 transition-scale duration-200 ease-in'>
+                  <FaUserEdit />
+                </Link>
+                <button onClick={()=>onDelete(listing.id)} className='text-xl text-red-700 hover:scale-125 transition-scale duration-200 ease-in'>
+                  <MdDeleteOutline />
+                </button>
             </div>
           </div>
       </div>

@@ -98,11 +98,16 @@ export const Profile = () => {
 //     fetchUserListing();
 // },[auth.currentUser.uid]);
 
+  function onDelete(){
+    if(window.confirm("Are you sure about this?")) {
+        alert("Listing has been deleted")
+    }
+  }
   return (
     <>
       <section className='max-w-6xl mx-auto flex items-center justify-center flex-col '>
         <h1 className='text-2xl text-center mt-6 font-bold text-white'>My Profile</h1>
-        <div className='w-full md:w-[50%] mt-6 px-3 border'>
+        <div className='w-full md:w-[50%] mt-6 px-3'>
           <form onSubmit={onSubmit}>
             <label htmlFor="name" className='text-white'>Change Name:</label>
             <input onChange={onChange} value={name} id='name' type='text' name='name' placeholder='Change Name' className='py-2 mb-4 w-full' disabled={!changeDetails} />
@@ -133,7 +138,7 @@ export const Profile = () => {
               <div className="container px-2 py-7 mx-auto">
                 <div className="flex  flex-wrap">
                     {listingRent.map((listing)=>(
-                      <ListingItem listing={listing} id={listing.id} key={listing.id} />
+                      <ListingItem listing={listing} id={listing.id} key={listing.id}  onDelete={()=>onDelete(listing.id)}/>
                     ))}
                 </div>
               </div>
