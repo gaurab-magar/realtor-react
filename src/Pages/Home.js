@@ -1,22 +1,47 @@
 import React from 'react';
-import {Swiper,SwiperSlide} from 'Swiper/react';
+import { listingImg } from '../ListingImage';
+import { Swiper, SwiperSlide } from 'swiper/react';
+
+// Import Swiper styles
 import 'swiper/css';
-import SwiperCore,{EffectFade,Autoplay,Navigation,pagination} from 'swiper';
+import{ Navigation, Pagination,History } from 'swiper/modules';
+
 export const Home = () => {
-  SwiperCore.use([Autoplay,Navigation,pagination,EffectFade]);
+
   return (
-    <main className='text-white'>
-      <div className='container px-6 py-4 mx-auto'>
-        <Swiper slidesPerView={1} navigation pagination={{type:'progressbar'}} effect='fade' modules={[EffectFade]} autoplay={{delay:3000}}>
-          {ListingItem.image.map((url,index)=>(
+  <main className='text-white'>
+    <div className='container px-6 py-4 mx-auto'>
+      <Swiper
+          spaceBetween={50}
+          slidesPerView={1}
+          navigation={true}
+          pagination={true}
+          history={{
+            key: 'slide',
+          }}
+          modules={[Navigation, Pagination, History]}
+          className="mySwiper"
+        >
+        {listingImg.map((item, index) => (
             <SwiperSlide key={index}>
-              <div className='w-full overflow-hidden h-[300px]' style={{background:`url(${listing.imgUrls[index]}) center no-repeat`}}>
-                
+              <div>
+                <img src={`${item.image}`} alt='pagination' />
               </div>
-            </SwiperSlide>
-          ))}
-        </Swiper>
-      </div>
-    </main>
-  )
-}
+            </SwiperSlide>))}
+      </Swiper>
+    </div>
+  </main>
+);
+};
+
+
+
+            // <div
+            //   className='w-full h-[300px]'
+            //   style={{
+            //     backgroundImage: `url(${item.image})`,
+            //     backgroundPosition: 'center',
+            //     backgroundRepeat: 'no-repeat',
+            //     backgroundSize: 'cover',
+            //   }}
+            // ></div>
