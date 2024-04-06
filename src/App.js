@@ -12,6 +12,8 @@ import { Footer } from './Components/Footer';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { CreateLinsting } from './Pages/CreateLinsting';
+import { ListingDetail } from './Pages/ListingDetail';
+
 function App() {
   return (
     <>
@@ -24,6 +26,7 @@ function App() {
           <Route path="/forgotpass" element={<ForgotPass />}/>
           <Route path="/offers" element={<Offers />}/>
           <Route path='/create-listing' element={<CreateLinsting />} />
+          <Route path='/listingDetail/:id' element={<ListingDetail />} />
 
           <Route path="/profile" element={<PrivateRoute />}>
             <Route path="/profile" element={<Profile />}/>

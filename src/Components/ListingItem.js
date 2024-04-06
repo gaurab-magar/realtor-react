@@ -7,7 +7,7 @@ import { Link } from 'react-router-dom';
 export const ListingItem = ({listing,id,onDelete}) => {
   return (
   <div className="p-4 md:w-1/3">
-    <Link to={`/category/${listing.type}/${id}`}>
+    <Link to={`/category/${id}`}>
       <div className="bg-gray-200 border-opacity-60 rounded-lg overflow-hidden shadow-white shadow-md hover:shadow-lg transition-shadow duration-150 relative">
           <img loading='lazy' className="lg:h-44 md:h-36 w-full object-cover object-center hover:scale-110 transition-scale duration-200 ease-in" src={listing.image} alt="blog" />
           <p className='font-semibold bg-blue-700 p-2 rounded-md text-white absolute top-2 left-2 text-xs shadow-lg'>7 Hours ago</p>
@@ -24,7 +24,7 @@ export const ListingItem = ({listing,id,onDelete}) => {
                 </span>
             </div>
             <div className="flex items-center flex-wrap ">
-              <a className="text-indigo-500 inline-flex items-center md:mb-2 lg:mb-0">Learn More
+              <a href='/' className="text-indigo-500 inline-flex items-center md:mb-2 lg:mb-0">Learn More
                 <svg className="w-4 h-4 ml-2" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M5 12h14"></path>
                   <path d="M12 5l7 7-7 7"></path>

@@ -1,5 +1,5 @@
 import { getAuth, updateProfile } from 'firebase/auth';
-import React, { useState , useEffect} from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router';
 import {toast} from 'react-toastify';
 import {db} from '../Firebase';
@@ -7,15 +7,12 @@ import { doc } from 'firebase/firestore';
 import { updateDoc } from 'firebase/firestore';
 import { FaHome } from "react-icons/fa";
 import { Link } from 'react-router-dom';
-import {collection, getDocs, orderBy, query, where} from 'firebase/firestore';
 import { ListingItem } from '../Components/ListingItem';
 
 export const Profile = () => {
 
   const auth =  getAuth();
   const navigate = useNavigate();
-  // const [listings , setListings] = useState(null);
-  const [loading , setLoading] = useState(true);
 
   const [changeDetails , setChangeDetails] = useState(false);
 
