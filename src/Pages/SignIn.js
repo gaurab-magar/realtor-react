@@ -39,7 +39,7 @@ export const SignIn = () => {
   return (
     <div className="flex justify-center flex-wrap items-center p-6 max-w-6xl mx-auto">
       <div className='md:w-[67%] lg:w-[50%] mb-12 md:mb-6'>
-        <img className='w-full rounded-2xl' src='https://cdn-gdalb.nitrocdn.com/LKErezJcAyurKLBNOppXfGJVQQbZsRzg/assets/images/optimized/rev-d924db9/www.luxurypresence.com/wp-content/uploads/2023/08/header-1-min-4-1200x720.jpg' alt='signInImg'></img>
+        <img className='w-full rounded-2xl' src='https://www.luxurypresence.com/wp-content/uploads/2023/08/header-1-min-4.jpg' alt='signInImg'></img>
       </div>
       <div className='w-full md:w-[67%] lg:w-[40%] lg:ml-20'>
         <div className='text-white text-center'>

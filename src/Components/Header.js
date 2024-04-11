@@ -24,7 +24,38 @@ export const Header = () => {
     }
   }
   return (
-    <header>
+    <header class="text-gray-600 body-font">
+      <div class="container mx-auto flex flex-wrap flex-col md:flex-row items-center">
+        <Link to="/" class="flex title-font font-medium items-center text-gray-900 mb-4 md:mb-0" >
+          <img className='h-16 cursor-pointer' src={navbarImg} alt='navbar-img'></img>
+        </Link>
+        <nav class="md:ml-auto md:mr-auto flex flex-wrap items-center text-base justify-center">
+          <Link to='/'>
+            <a className={`mr-5 cursor-pointer py-5 px-2 hover:text-yellow-500 text-gray-400 ${pathMatchRoute('/') && "text-light border-b-yellow-400 border-b-[3px]"}`}>Home</a>
+          </Link>
+          <Link to='/offers'>
+            <a className={`mr-5 cursor-pointer py-5 px-2 hover:text-yellow-500 text-gray-400 ${pathMatchRoute('/offers') && "text-light border-b-yellow-400 border-b-[3px]"}`}>Offers</a>
+          </Link>
+          <Link to='/Contact'>
+            <a className={`mr-5 cursor-pointer py-5 px-2 hover:text-yellow-500 text-gray-400 ${pathMatchRoute('/Contact') && "text-light border-b-yellow-400 border-b-[3px]"}`}>Contact Us</a>
+          </Link>
+        </nav>
+        {pageState ? 
+            <Link to='/profile'
+               className={`cursor-pointer py-5 px-2 hover:text-yellow-500 text-gray-400 ${pathMatchRoute('/profile') && "text-light border-b-yellow-400 border-b-[3px]"}`}>{pageState}
+            </Link>:
+            <Link to='/signin' className={`cursor-pointer py-5 px-2 hover:text-yellow-500 text-gray-400 ${pathMatchRoute('/signin') && "text-light border-b-yellow-400 border-b-[3px]"}`}>{pageState}
+            </Link>
+          }
+      </div>
+    </header>
+
+  )
+}
+
+
+
+{/* <header>
         <div className='bg-black px-10 shadow-sm sticky top-0 z-50 flex justify-between items-center'>
           <div>
             <Link to="/">
@@ -50,6 +81,4 @@ export const Header = () => {
             </ul>
           </div>
         </div>
-    </header>
-  )
-}
+    </header> */}

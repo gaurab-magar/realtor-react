@@ -12,7 +12,7 @@ import { Footer } from './Components/Footer';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { CreateLinsting } from './Pages/CreateLinsting';
-
+import { Contact } from './Pages/Contact';
 function App() {
   return (
     <>
@@ -20,6 +20,7 @@ function App() {
       <Header />
         <Routes>
           <Route path='/' element={<Home />} />
+          <Route path='/contact' element={<Contact />} />
           <Route path="/signin" element={<SignIn />}/>
           <Route path="/signup" element={<SignUp />}/>
           <Route path="/forgotpass" element={<ForgotPass />}/>
